@@ -14,8 +14,20 @@ cabal-version:       >=1.10
 library
   hs-source-dirs: src
   exposed-modules:
+    Pnganim
+    Pnganim.Image
+    Pnganim.Area
+    Pnganim.Types
   build-depends:
+    base == 4.6.*,
+    base-unicode-symbols == 0.2.*,
+    bytestring == 0.10.*,
+    JuicyPixels == 3.1.*,
+    containers == 0.5.*,
+    mtl == 2.1.*,
+    vector == 0.10.*
   default-language: Haskell2010
+  default-extensions: UnicodeSyntax
 
 executable pnganim
   main-is: pnganim.hs

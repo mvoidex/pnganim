@@ -1,6 +1,2 @@
-module Main (
-	main
+module Pnganim (
 	) where
-
-main :: IO ()
-main = undefined
