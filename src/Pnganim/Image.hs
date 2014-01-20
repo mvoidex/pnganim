@@ -3,7 +3,7 @@ module Pnganim.Image (
 	pixel16to8, imageToRGB8,
 
 	-- * Image ops
-	subtractImage, diffsImages,
+	diffImages, diffImageList,
 
 	-- * Loading
 	decodePngAsRGB8, readPngAsRGB8
@@ -13,7 +13,6 @@ import Prelude.Unicode
 
 import Control.Monad.Error
 import Data.ByteString (ByteString)
-import qualified Data.Vector.Storable as V
 import Codec.Picture
 import Codec.Picture.Types (promotePixel, promoteImage, dropTransparency, convertPixel)
 
@@ -39,18 +38,20 @@ imageToRGB8 (ImageCMYK16 i) = pixelMap (down ∘ convertPixel) i where
 	down (PixelRGB16 r g b) = PixelRGB8 (pixel16to8 r) (pixel16to8 g) (pixel16to8 b)
 
 -- | Subtract one image from another. Images must be of same size
-subtractImage :: Pixel a ⇒ Image a → Image a → Maybe (Image a)
-subtractImage l r
+diffImages :: Pixel a ⇒ Image a → Image a → Maybe (Image Pixel8)
+diffImages l r
 	| (imageWidth l ≡ imageWidth r) ∧ (imageHeight l ≡ imageHeight r) =
-		Just $ Image (imageWidth l) (imageHeight l) $
-			V.zipWith (-) (imageData l) (imageData r)
+		Just $ generateImage
+			(\x y → if pixelAt l x y ≢ pixelAt r x y then 255 else 0)
+			(imageWidth l)
+			(imageHeight l)
 	| otherwise = Nothing
 
 -- | Get diffs between images
-diffsImages :: Pixel a ⇒ [Image a] → Maybe [Image a]
-diffsImages [] = Nothing
-diffsImages [_] = Just []
-diffsImages imgs = sequence $ zipWith subtractImage imgs (tail imgs)
+diffImageList :: Pixel a ⇒ [Image a] → Maybe [Image Pixel8]
+diffImageList [] = Nothing
+diffImageList [_] = Just []
+diffImageList imgs = sequence $ zipWith diffImages imgs (tail imgs)
 
 -- | Decode png and convert image to RGB8
 decodePngAsRGB8 :: ByteString → Either String (Image PixelRGB8)

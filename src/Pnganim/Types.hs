@@ -14,6 +14,7 @@ data Slice = Slice {
 	sliceRight :: Int,
 	sliceTop :: Int,
 	sliceBottom :: Int }
+		deriving (Eq, Ord, Read, Show)
 
 -- | Width of slice
 sliceWidth :: Slice → Int
@@ -29,7 +30,7 @@ emptySlice = Slice 0 0 0 0
 
 -- | Slice of one pixel
 pixelSlice :: Int → Int → Slice
-pixelSlice x y = slice x y (succ x) (succ y)
+pixelSlice x y = slice x (succ x) y (succ y)
 
 -- | Is slice null
 sliceNull :: Slice → Bool
